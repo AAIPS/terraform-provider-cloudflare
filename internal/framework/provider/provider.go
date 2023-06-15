@@ -3,31 +3,21 @@ package provider
 import (
 	"context"
 	"fmt"
-	"log"
 	"math"
 	"regexp"
 	"strconv"
-	"testing"
 
 	"github.com/cloudflare/cloudflare-go"
 	"github.com/cloudflare/terraform-provider-cloudflare/internal/consts"
-	"github.com/cloudflare/terraform-provider-cloudflare/internal/framework/service/r2_bucket"
-	"github.com/cloudflare/terraform-provider-cloudflare/internal/framework/service/rulesets"
-	"github.com/cloudflare/terraform-provider-cloudflare/internal/framework/service/turnstile"
-	"github.com/cloudflare/terraform-provider-cloudflare/internal/sdkv2provider"
 	"github.com/cloudflare/terraform-provider-cloudflare/internal/utils"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
-	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
-	"github.com/hashicorp/terraform-plugin-mux/tf5to6server"
-	"github.com/hashicorp/terraform-plugin-mux/tf6muxserver"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/logging"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/meta"
 )
@@ -308,9 +298,7 @@ func (p *CloudflareProvider) Configure(ctx context.Context, req provider.Configu
 
 func (p *CloudflareProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		r2_bucket.NewResource,
-		rulesets.NewResource,
-		turnstile.NewResource,
+		// NewExampleResource,
 	}
 }
 
@@ -326,27 +314,4 @@ func New(version string) func() provider.Provider {
 			version: version,
 		}
 	}
-}
-
-var TestAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
-	"cloudflare": func() (tfprotov6.ProviderServer, error) {
-		upgradedSdkProvider, err := tf5to6server.UpgradeServer(context.Background(), sdkv2provider.New("dev")().GRPCProvider)
-		if err != nil {
-			log.Fatal(err)
-		}
-		providers := []func() tfprotov6.ProviderServer{
-			func() tfprotov6.ProviderServer {
-				return upgradedSdkProvider
-			},
-			providerserver.NewProtocol6(New("dev")()),
-		}
-
-		return tf6muxserver.NewMuxServer(context.Background(), providers...)
-	},
-}
-
-func TestAccPreCheck(t *testing.T) {
-	// You can add code here to run prior to any test case execution, for example assertions
-	// about the appropriate environment variables being set are common to see in a pre-check
-	// function.
 }

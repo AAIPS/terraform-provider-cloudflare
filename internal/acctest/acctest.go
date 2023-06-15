@@ -1,17 +1,13 @@
 package acctest
 
 import (
-	"context"
-	"log"
 	"os"
 	"testing"
 
+	"github.com/cloudflare/terraform-provider-cloudflare/internal/consts"
 	"github.com/cloudflare/terraform-provider-cloudflare/internal/framework/provider"
-	"github.com/cloudflare/terraform-provider-cloudflare/internal/sdkv2provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
-	"github.com/hashicorp/terraform-plugin-mux/tf5to6server"
-	"github.com/hashicorp/terraform-plugin-mux/tf6muxserver"
 )
 
 var (
@@ -30,48 +26,46 @@ var (
 )
 
 var TestAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
-	"cloudflare": func() (tfprotov6.ProviderServer, error) {
-		upgradedSdkProvider, err := tf5to6server.UpgradeServer(context.Background(), sdkv2provider.New("dev")().GRPCProvider)
-		if err != nil {
-			log.Fatal(err)
-		}
-		providers := []func() tfprotov6.ProviderServer{
-			func() tfprotov6.ProviderServer {
-				return upgradedSdkProvider
-			},
-			providerserver.NewProtocol6(provider.New("dev")()),
-		}
-
-		return tf6muxserver.NewMuxServer(context.Background(), providers...)
-	},
+	"cloudflare": providerserver.NewProtocol6WithError(provider.New("dev")()),
 }
 
 func TestAccPreCheck(t *testing.T) {
 	// You can add code here to run prior to any test case execution, for example assertions
 	// about the appropriate environment variables being set are common to see in a pre-check
 	// function.
-}
 
-func TestAccPreCheck_Zone(t *testing.T) {
-	// You can add code here to run prior to any test case execution, for example assertions
-	// about the appropriate environment variables being set are common to see in a pre-check
-	// function.
-}
-
-func TestAccPreCheck_Account(t *testing.T) {
-	// You can add code here to run prior to any test case execution, for example assertions
-	// about the appropriate environment variables being set are common to see in a pre-check
-	// function.
-}
-
-func TestAccSkipForDefaultZone(t *testing.T, reason string) {
-	if os.Getenv("CLOUDFLARE_ZONE_ID") == testAccCloudflareZoneID {
-		t.Skipf("Skipping acceptance test for default zone (%s). %s", testAccCloudflareZoneID, reason)
-	}
+	testAccPreCheckEmail(t)
+	testAccPreCheckApiKey(t)
+	testAccPreCheckDomain(t)
+	testAccPreCheckZoneID(t)
 }
 
 func TestAccSkipForDefaultAccount(t *testing.T, reason string) {
 	if os.Getenv("CLOUDFLARE_ACCOUNT_ID") == testAccCloudflareAccountID {
 		t.Skipf("Skipping acceptance test for default account (%s). %s", testAccCloudflareAccountID, reason)
+	}
+}
+
+func testAccPreCheckEmail(t *testing.T) {
+	if v := os.Getenv(consts.EmailEnvVarKey); v == "" {
+		t.Fatalf("%s must be set for acceptance tests", consts.EmailEnvVarKey)
+	}
+}
+
+func testAccPreCheckApiKey(t *testing.T) {
+	if v := os.Getenv(consts.APIKeyEnvVarKey); v == "" {
+		t.Fatalf("%s must be set for acceptance tests", consts.APIKeyEnvVarKey)
+	}
+}
+
+func testAccPreCheckDomain(t *testing.T) {
+	if v := os.Getenv("CLOUDFLARE_DOMAIN"); v == "" {
+		t.Fatal("CLOUDFLARE_DOMAIN must be set for acceptance tests. The domain is used to create and destroy record against.")
+	}
+}
+
+func testAccPreCheckZoneID(t *testing.T) {
+	if v := os.Getenv("CLOUDFLARE_ZONE_ID"); v == "" {
+		t.Fatal("CLOUDFLARE_ZONE_ID must be set for acceptance tests")
 	}
 }
