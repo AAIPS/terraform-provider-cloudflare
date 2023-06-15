@@ -3,9 +3,8 @@ module github.com/cloudflare/terraform-provider-cloudflare
 go 1.20
 
 require (
-	github.com/cloudflare/cloudflare-go v0.69.0
+	github.com/cloudflare/cloudflare-go v0.0.1
 	github.com/fatih/color v1.13.0 // indirect
-	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect
 	github.com/hashicorp/go-plugin v1.4.9 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
@@ -21,6 +20,8 @@ require (
 	golang.org/x/time v0.3.0 // indirect
 )
 
+replace github.com/cloudflare/cloudflare-go v0.0.1 => github.com/AAIPS/cloudflare-go v0.0.1
+
 require (
 	github.com/hashicorp/terraform-plugin-framework v1.3.0
 	github.com/hashicorp/terraform-plugin-framework-validators v0.10.0
@@ -32,7 +33,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/hashicorp/go-retryablehttp v0.7.3 // indirect
 	github.com/hashicorp/go-version v1.6.0 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/terraform-registry-address v0.2.0 // indirect
