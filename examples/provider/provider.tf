@@ -1,25 +1,14 @@
-# Configure the Cloudflare provider using the required_providers stanza
-# required with Terraform 0.13 and beyond. You may optionally use version
-# directive to prevent breaking changes occurring unannounced.
 terraform {
   required_providers {
     cloudflare = {
-      source  = "cloudflare/cloudflare"
-      version = "~> 4.0"
+      source  = "localhost/cloudflare/cloudflare"
     }
   }
 }
 
 provider "cloudflare" {
-  api_token = var.cloudflare_api_token
+#  api_token = "<API_TOKEN>"
+  api_token = "GUPdRtsTRcIejTnmD3m9xw5wimnN0SGK0U1sZzyY"
 }
 
-# Create a record
-resource "cloudflare_record" "www" {
-  # ...
-}
-
-# Create a page rule
-resource "cloudflare_page_rule" "www" {
-  # ...
-}
+resource "cloudflare_ruleset" "example" {}

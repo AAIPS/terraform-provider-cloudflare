@@ -24,7 +24,7 @@ func main() {
 		context.Background(),
 		framework.New(version),
 		providerserver.ServeOpts{
-			Address: "registry.terraform.io/cloudflare/cloudflare",
+			Address: "localhost/cloudflare/cloudflare",
 			Debug:   debug,
 		})
 
